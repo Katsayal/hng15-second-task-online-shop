@@ -96,4 +96,7 @@ Keep credentials such as `DATABASE_URL`, `STRIPE_SECRET_KEY`,
 Values that must be present in client bundles or are public configuration,
 including `NEXT_PUBLIC_*`, `MAILGUN_BASE_URL`, and `MAILGUN_DOMAIN`, must not be
 marked as secret. Netlify's secret scanner will block a deployment if a value
-classified as secret appears in source files or generated build output.
+classified as secret appears in source files or generated build output. This
+project excludes only Netlify's generated Turbopack cache from the scan, because
+that cache can contain serialized build-time environment values; scanning
+remains enabled for source files and deployable build output.
