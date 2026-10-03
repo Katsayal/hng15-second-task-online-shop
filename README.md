@@ -82,10 +82,18 @@ deployment: `checkout.session.completed`,
 
 Successful paid Checkout events send an order receipt through Mailgun after
 the order and inventory transaction commits. Set `MAILGUN_API_KEY`,
-`MAILGUN_DOMAIN`, and `MAILGUN_BASE_URL` in `.env.local`; use
-`https://api.mailgun.net` for US Mailgun accounts or
-`https://api.eu.mailgun.net` for EU accounts. Mailgun sandbox domains can only
-send to recipient addresses explicitly authorized in Mailgun. For general
-delivery, configure and verify your sending domain and its DNS records in
-Mailgun. A Mailgun send failure returns an error to Stripe so its webhook
-delivery is retried.
+`MAILGUN_DOMAIN`, and `MAILGUN_BASE_URL` in `.env.local`, using the API base
+URL for your Mailgun account's region. Mailgun sandbox domains can only send
+to recipient addresses explicitly authorized in Mailgun. For general delivery,
+configure and verify your sending domain and its DNS records in Mailgun. A
+receipt delivery failure is logged separately and does not fail the already
+processed payment webhook.
+
+## Netlify environment variables
+
+Keep credentials such as `DATABASE_URL`, `STRIPE_SECRET_KEY`,
+`STRIPE_WEBHOOK_SECRET`, and `MAILGUN_API_KEY` marked as secret in Netlify.
+Values that must be present in client bundles or are public configuration,
+including `NEXT_PUBLIC_*`, `MAILGUN_BASE_URL`, and `MAILGUN_DOMAIN`, must not be
+marked as secret. Netlify's secret scanner will block a deployment if a value
+classified as secret appears in source files or generated build output.
