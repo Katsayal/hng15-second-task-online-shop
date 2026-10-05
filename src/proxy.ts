@@ -3,6 +3,17 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseConfig } from "@/lib/supabase/config";
 
 export async function proxy(request: NextRequest) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (process.env.NODE_ENV === "production" && appUrl) {
+    const canonicalUrl = new URL(
+      request.nextUrl.pathname + request.nextUrl.search,
+      appUrl,
+    );
+    if (request.nextUrl.origin !== canonicalUrl.origin) {
+      return NextResponse.redirect(canonicalUrl);
+    }
+  }
+
   let response = NextResponse.next({ request });
   const { url, anonKey } = getSupabaseConfig();
 
