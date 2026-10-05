@@ -16,6 +16,7 @@ type CartContextValue = {
   itemCount: number;
   total: number;
   isOpen: boolean;
+  isHydrated: boolean;
   openCart: () => void;
   closeCart: () => void;
   addItem: (product: CartProduct, quantity?: number) => void;
@@ -134,7 +135,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const clearCart = useCallback(() => setItems([]), []);
+  const clearCart = useCallback(() => {
+    setItems([]);
+    setIsOpen(false);
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -142,6 +146,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       itemCount: items.reduce((count, item) => count + item.quantity, 0),
       total: items.reduce((sum, item) => sum + item.price * item.quantity, 0),
       isOpen,
+      isHydrated,
       openCart: () => setIsOpen(true),
       closeCart: () => setIsOpen(false),
       addItem,
@@ -149,7 +154,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem,
       clearCart,
     }),
-    [items, isOpen, addItem, setQuantity, removeItem, clearCart],
+    [items, isOpen, isHydrated, addItem, setQuantity, removeItem, clearCart],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

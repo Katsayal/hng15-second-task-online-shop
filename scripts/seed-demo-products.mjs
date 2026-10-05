@@ -23,7 +23,7 @@ const products = [
     description:
       "A gentle, plant-based hand wash with a fresh botanical scent, made for everyday sinks.",
     price: "14.00",
-    stockQuantity: 18,
+    stockQuantity: 21,
     imageUrl:
       "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=1000&q=85",
   },
@@ -32,13 +32,26 @@ const products = [
     description:
       "A durable, easy-to-carry canvas tote for market trips, books, and all the little things.",
     price: "24.00",
-    stockQuantity: 16,
+    stockQuantity: 21,
     imageUrl:
       "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=1000&q=85",
   },
 ];
 
 try {
+  const stockReset = await prisma.product.updateMany({
+    where: {
+      name: {
+        in: [
+          ...products.map((product) => product.name),
+          "Stripe Checkout Test Product",
+        ],
+      },
+    },
+    data: { stockQuantity: 21 },
+  });
+  console.log(`Reset stock to 21 for ${stockReset.count} existing products.`);
+
   for (const product of products) {
     const existing = await prisma.product.findFirst({
       where: { name: product.name },
@@ -46,7 +59,7 @@ try {
     });
 
     if (existing) {
-      console.log(`Already in catalog: ${product.name}`);
+      console.log(`Stock set to 21: ${product.name}`);
       continue;
     }
 
