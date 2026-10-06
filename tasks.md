@@ -1,32 +1,73 @@
-# Implementation Tasks Checklist
+# Implementation Tasks
 
-## Phase 1: Context & Dev Environment Anchoring
-- [x] Initialize Next.js project with Tailwind CSS and TypeScript.
-- [x] Install dependency modules (`@prisma/client`, `@supabase/supabase-js`, `stripe`, `mailgun.js`, `form-data`) and Prisma CLI.
-- [x] Configure local `.env.local` using the `.env.example` structure.
-- [x] Initialize Prisma schema using the architecture blueprint.
-- [x] Execute the first database push onto the Neon instance.
+## Phase 1: Web foundation and local environment — complete
 
-## Phase 2: Google Authentication Integration
-- [x] Provision OAuth 2.0 Web Client credentials inside Google Cloud Console.
-- [x] Wire keys into Supabase Auth provider settings portal.
-- [x] Construct login page UI and implement Supabase Auth session handling with a Just-In-Time (JIT) Prisma upsert function ensuring the authenticated user exists in the Neon database.
-- [x] Create Next.js route protection for checkout and order history.
+- [x] Initialize Next.js with Tailwind CSS and TypeScript.
+- [x] Install application dependencies and Prisma.
+- [x] Configure local environment variables.
+- [x] Define the Prisma schema and connect it to Neon.
 
-## Phase 3: Storefront UI & Local Cart State
-- [x] Set up global client-side cart state using React Context and `localStorage`.
-- [x] Implement responsive Product Grid Page mapping database arrays directly to UI viewcards.
-- [x] Build product description route views containing interactive quantity modifiers.
-- [x] Build a slide-out drawer rendering active cart totals and a "Proceed to Checkout" button.
+## Phase 2: Google authentication — complete
 
-## Phase 4: Stripe Checkout Pipeline
-- [x] Configure Stripe test-mode keys.
-- [x] Configure local Stripe CLI webhook forwarding and verify a successful end-to-end test payment.
-- [x] Author server-side API generation endpoint creating tailored checkout links from database prices.
-- [x] Write verified webhook route executing critical relational data mutations inside Neon.
+- [x] Configure Google OAuth through Supabase Auth.
+- [x] Implement sign-in, session handling, and JIT Prisma user upsert.
+- [x] Protect checkout routes for signed-out users.
 
-## Phase 5: Automated Mailgun Receipts
-- [x] Authorize the sandbox recipient and verify receipt delivery after a test checkout.
-- [ ] Configure a production custom sending domain and its DNS records for general recipient delivery.
-- [x] Write a Mailgun receipt utility using order and customer attributes.
-- [x] Hook receipt sending into successful paid-order webhook processing.
+## Phase 3: Storefront and local cart — complete for web
+
+- [x] Build the responsive product catalog and product details.
+- [x] Build cart drawer and quantity controls.
+- [x] Persist the web cart in browser `localStorage`.
+- [x] Clear the cart after successful checkout.
+
+## Phase 4: Stripe checkout — complete
+
+- [x] Create server-priced Stripe Checkout Sessions.
+- [x] Verify Stripe webhooks and update orders/inventory transactionally.
+- [x] Verify local test-mode checkout end to end.
+
+## Phase 5: Mailgun receipts — implemented; production sender setup outstanding
+
+- [x] Send a receipt after successful paid-order processing.
+- [x] Verify delivery to an authorized sandbox recipient.
+- [ ] Configure and verify a custom Mailgun sending domain for arbitrary
+      recipient delivery.
+
+## Phase 6: Monorepo foundation — repository changes complete
+
+- [x] Move the existing website, API routes, Prisma schema, and scripts to
+      `apps/web`.
+- [x] Add root npm-workspace commands while keeping one root lockfile.
+- [x] Configure the root Netlify build command to build the web workspace.
+- [x] Move the local environment template and ignored `.env.local` into
+      `apps/web`.
+- [x] Document the existing backend and mobile integration gaps.
+- [ ] In Netlify build settings, keep the base directory at the repository
+      root and set the package directory to `apps/web`.
+
+## Phase 7: Shared backend cart and mobile app — next
+
+- [ ] Select the simplest mobile framework suitable for the assessment.
+- [ ] Scaffold the mobile app as a separate workspace under `apps/mobile`.
+- [ ] Configure mobile Supabase sign-in against the same project/user accounts
+      as web.
+- [ ] Extend authenticated API routes to accept both the web cookie session
+      and a validated mobile Supabase bearer token.
+- [ ] Expose the product catalog through a backend API route for mobile.
+- [ ] Add a per-user server-side cart model and authenticated cart API to the
+      existing Next.js backend.
+- [ ] Make the website load and persist the authenticated user's server cart
+      instead of relying only on `localStorage`.
+- [ ] Make mobile load and persist the same server cart.
+- [ ] Verify web-to-mobile and mobile-to-web cart synchronization using the
+      nine-step flow in `prd.md`.
+- [ ] Confirm checkout still calculates trusted prices and validates stock on
+      the server.
+
+## Project working rules
+
+- Simple is king. Avoid unnecessary abstractions, dependencies, and
+  infrastructure.
+- Do not run `npm run build` unless explicitly asked.
+- Never inspect `.env.local`; inspect `.env.example` for variable names.
+- Make the smallest relevant change and run the narrowest useful checks.

@@ -1,36 +1,19 @@
 {
-  "name": "hng-ecommerce",
+  "name": "hng-shop-monorepo",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint",
-    "seed:demo": "node scripts/seed-demo-products.mjs"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.19.3",
-    "@supabase/ssr": "^0.12.7",
-    "@supabase/supabase-js": "^2.117.2",
-    "form-data": "^4.0.6",
-    "mailgun.js": "^14.0.1",
-    "next": "16.3.8",
-    "react": "19.2.8",
-    "react-dom": "19.2.8",
-    "stripe": "^23.0.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "babel-plugin-react-compiler": "1.0.0",
-    "dotenv": "^18.0.5",
-    "eslint": "^9",
-    "eslint-config-next": "16.3.8",
-    "prisma": "^6.19.3",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "dev": "npm run dev --workspace=@hng-shop/web",
+    "build": "npm run build --workspace=@hng-shop/web",
+    "start": "npm run start --workspace=@hng-shop/web",
+    "lint": "npm run lint --workspace=@hng-shop/web",
+    "seed:demo": "npm run seed:demo --workspace=@hng-shop/web",
+    "replay:paid-event": "npm run replay:paid-event --workspace=@hng-shop/web --",
+    "db:studio": "npm run db:studio --workspace=@hng-shop/web",
+    "db:generate": "npm run db:generate --workspace=@hng-shop/web"
   }
 }

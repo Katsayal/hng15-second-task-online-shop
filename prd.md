@@ -1,31 +1,69 @@
-# Product Requirements Document (PRD)
+# Product Requirements Document
 
-## Project Overview
-A highly streamlined, lightning-fast e-commerce shop built for efficiency and speed. The application minimizes database infrastructure by utilizing local browser storage for cart tracking, executing transactional actions via API endpoints during checkouts, and securing access via Google OAuth.
+## Project overview
 
-## Target Audience
-General consumer retail buyers looking for a straightforward, frictionless click-and-buy shopping experience.
+HNG Shop is a simple online storefront with a shared backend for web and a
+planned mobile app. The mobile app must use the same API and user identity as
+the deployed website. The shared cart is the main requirement of this phase.
 
-## Functional Requirements
+## Audience
 
-### 1. User Identity & Authentication
-* **Google OAuth Login:** Users must be able to sign up and log in using their Google account via Supabase Auth.
-* **Session Guarding:** Public routes allow browsing. The checkout flow and user order history pages are protected and require active authentication.
-* **Just-In-Time (JIT) Database Sync:** To keep the infrastructure simple, when a user successfully authenticates via Supabase, the application layer will check the Neon database via Prisma. If the user record does not exist in Neon, it will be automatically upserted on-the-fly (e.g., during login completion or right before checkout tokenization) to ensure relational integrity without complex database triggers.
+Retail customers and anonymous assessors evaluating the end-to-end shopping
+experience across web and mobile.
 
-### 2. Product Catalog
-* **Dynamic Grid View:** A clean main landing page showing a grid of available products fetched from the Neon database.
-* **Product Detail Pages:** Individual dynamic item views detailing description, pricing, and sizing/variants if applicable.
+## Existing web requirements
 
-### 3. Shopping Cart Management
-* **Client-Side Persistence:** Products added to the cart are stored inside the browser's `localStorage` (no database writes during shopping).
-* **Cart Operations:** Users can add, modify quantities, or remove items instantly.
+### Identity and authentication
 
-### 4. Checkout Pipeline
-* **Secure Payment Processing:** Transition client-side cart items into a secure server-side Stripe Checkout Session.
-* **Pricing Verification:** Absolute pricing totals are computed directly on the server from the Neon database records to prevent client-side tampering.
+- Users browse the public catalog and use Google sign-in through Supabase Auth.
+- Checkout is restricted to authenticated users.
+- Successful authentication creates or updates the corresponding user in
+  Neon through Prisma.
 
-### 5. Automated Fulfillment Notifications
-* **Stripe Webhook Triggers:** Listen for verified successful transactions from Stripe.
-* **Database Updates:** Update product inventory quantities and order records in Neon Postgres upon successful payment.
-* **Transactional Receipts:** Instantly send clean, structured HTML confirmation emails to the buyer via Mailgun.
+### Catalog and checkout
+
+- The catalog and product details are read from Neon.
+- Checkout uses current server-side product prices and Stripe Checkout.
+- A verified paid Stripe webhook updates the order and stock in a database
+  transaction.
+- Successful paid orders trigger a receipt email through Mailgun.
+
+## Mobile application requirements
+
+- Add a mobile client in the monorepo. The framework is not selected yet; pick
+  the simplest suitable option before scaffolding it.
+- Mobile and web sign in to the same Supabase project and resolve to the same
+  user account.
+- Mobile uses the same deployed Next.js backend for catalog, cart, and checkout
+  operations. Expose catalog and cart operations through API routes in this
+  phase; do not duplicate database or payment business logic in mobile.
+- A signed-in user's cart is stored server-side and is shared by web and
+  mobile. The server is the source of truth for cross-device cart contents.
+- Cart changes made on either client must be visible in the other after it
+  refreshes/loads the shared cart. Real-time push is not required for the
+  assessment flow unless later requested.
+- Product prices and available stock remain server-authoritative; do not trust
+  mobile-supplied prices or totals.
+
+## Required assessment flow
+
+1. Open the web application and sign up/sign in with a new account.
+2. Show that web sign-in succeeded.
+3. Add a product to the web cart.
+4. Open the mobile app.
+5. Sign in on mobile with the same account.
+6. Show the web-added product in the mobile cart.
+7. Add another product from mobile.
+8. Return to the web application.
+9. Show the mobile-added product in the web cart.
+
+The existing cart uses browser `localStorage`, and no server-side cart
+endpoints or cart tables exist yet. Implement those as part of this phase.
+
+## Working principles
+
+- Simple is king: prefer the clearest adequate approach; avoid unnecessary
+  abstractions, dependencies, and infrastructure.
+- Do not run `npm run build` unless explicitly requested.
+- Do not inspect `.env.local`; use `.env.example` for variable names.
+- Validate with the smallest relevant checks and avoid unrelated changes.

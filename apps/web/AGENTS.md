@@ -7,11 +7,3 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
-
-## Project preferences
-
-- Keep solutions simple. Prefer the smallest clear change that solves the actual problem; avoid unnecessary abstractions and dependencies.
-- Do not run `npm run build` unless the user explicitly asks.
-- Do not open, print, or inspect `.env.local` or other secret-bearing environment files. Use `.env.example` to inspect variable names and structure.
-- Work pragmatically: inspect relevant code, use existing patterns, validate with the smallest relevant checks, and avoid unrelated changes.
-- Explain any required behavior or deployment changes clearly.
