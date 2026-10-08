@@ -42,26 +42,26 @@
 - [x] Move the local environment template and ignored `.env.local` into
       `apps/web`.
 - [x] Document the existing backend and mobile integration gaps.
-- [ ] In Netlify build settings, keep the base directory at the repository
+- [x] In Netlify build settings, keep the base directory at the repository
       root and set the package directory to `apps/web`.
 
-## Phase 7: Shared backend cart and mobile app — next
+## Phase 7: Shared backend cart and mobile app — complete
 
-- [ ] Select the simplest mobile framework suitable for the assessment.
-- [ ] Scaffold the mobile app as a separate workspace under `apps/mobile`.
-- [ ] Configure mobile Supabase sign-in against the same project/user accounts
+- [x] Select the simplest mobile framework suitable for the assessment (Expo with React Native and TypeScript).
+- [x] Scaffold the mobile app as a separate workspace under `apps/mobile`.
+- [x] Configure mobile Supabase sign-in against the same project/user accounts
       as web.
-- [ ] Extend authenticated API routes to accept both the web cookie session
+- [x] Extend authenticated API routes to accept both the web cookie session
       and a validated mobile Supabase bearer token.
-- [ ] Expose the product catalog through a backend API route for mobile.
-- [ ] Add a per-user server-side cart model and authenticated cart API to the
+- [x] Expose the product catalog through a backend API route for mobile.
+- [x] Add a per-user server-side cart model and authenticated cart API to the
       existing Next.js backend.
-- [ ] Make the website load and persist the authenticated user's server cart
+- [x] Make the website load and persist the authenticated user's server cart
       instead of relying only on `localStorage`.
-- [ ] Make mobile load and persist the same server cart.
-- [ ] Verify web-to-mobile and mobile-to-web cart synchronization using the
+- [x] Make mobile load and persist the same server cart.
+- [x] Verify web-to-mobile and mobile-to-web cart synchronization using the
       nine-step flow in `prd.md`.
-- [ ] Confirm checkout still calculates trusted prices and validates stock on
+- [x] Confirm checkout still calculates trusted prices and validates stock on
       the server.
 
 ## Project working rules

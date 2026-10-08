@@ -10,7 +10,8 @@
     "seed:demo": "node scripts/seed-demo-products.mjs",
     "replay:paid-event": "node scripts/replay-paid-stripe-event.mjs",
     "db:studio": "prisma studio",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

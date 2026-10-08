@@ -2,27 +2,35 @@ import Link from "next/link";
 import { ClearCartOnSuccess } from "@/components/clear-cart-on-success";
 import { getStripeClient } from "@/lib/stripe";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 
 type CheckoutSuccessPageProps = {
-  searchParams: Promise<{ session_id?: string }>;
+  searchParams: Promise<{ session_id?: string; source?: string }>;
 };
 
 export default async function CheckoutSuccessPage({
   searchParams,
 }: CheckoutSuccessPageProps) {
-  const { session_id: sessionId } = await searchParams;
+  const { session_id: sessionId, source } = await searchParams;
   const supabase = await createSupabaseServerClient({ readOnly: true });
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   let paid = false;
-  if (sessionId && user) {
+  if (sessionId) {
     try {
       const session = await getStripeClient().checkout.sessions.retrieve(sessionId);
-      paid =
-        session.payment_status === "paid" &&
-        session.metadata?.userId === user.id;
+      if (session.payment_status === "paid") {
+        if (!user || session.metadata?.userId === user.id) {
+          paid = true;
+          if (session.metadata?.userId) {
+            await prisma.cartItem.deleteMany({
+              where: { cart: { userId: session.metadata.userId } },
+            }).catch(() => {});
+          }
+        }
+      }
     } catch (error) {
       console.error("Could not verify Stripe Checkout success session.", error);
     }
@@ -45,12 +53,18 @@ export default async function CheckoutSuccessPage({
           ? "Your payment was successful. Your order is being confirmed."
           : "Please return to the shop and check your Stripe receipt, or try checkout again."}
       </p>
-      <Link
-        href="/"
-        className="mt-7 rounded-full bg-[#245b43] px-5 py-3.5 text-sm font-medium text-white transition hover:bg-[#194531]"
-      >
-        Return to shop
-      </Link>
+      {source === "mobile" ? (
+        <p className="mt-7 text-sm font-semibold text-[#245b43]">
+          ✓ Please return to your mobile app
+        </p>
+      ) : (
+        <Link
+          href="/"
+          className="mt-7 rounded-full bg-[#245b43] px-5 py-3.5 text-sm font-medium text-white transition hover:bg-[#194531]"
+        >
+          Return to shop
+        </Link>
+      )}
     </main>
   );
 }

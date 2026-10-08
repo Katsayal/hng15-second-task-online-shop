@@ -20,6 +20,13 @@
     "seed:demo": "npm run seed:demo --workspace=@hng-shop/web",
     "replay:paid-event": "npm run replay:paid-event --workspace=@hng-shop/web --",
     "db:studio": "npm run db:studio --workspace=@hng-shop/web",
-    "db:generate": "npm run db:generate --workspace=@hng-shop/web"
+    "db:generate": "npm run db:generate --workspace=@hng-shop/web",
+    "db:migrate": "npm run db:migrate --workspace=@hng-shop/web",
+    "mobile": "npm run start --workspace=@hng-shop/mobile"
+  },
+  "overrides": {
+    "braces": "^3.0.3",
+    "deepmerge-ts": "^8.0.2",
+    "node-forge": "^1.4.0"
   }
 }

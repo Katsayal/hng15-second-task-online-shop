@@ -26,6 +26,7 @@ Open [http://localhost:3000](http://localhost:3000). Other root commands:
 
 ```bash
 npm run lint
+npm run db:migrate
 npm run db:studio
 npm run seed:demo
 ```
@@ -133,14 +134,23 @@ as secret. Netlify's secret scanner excludes only the web app's generated
 Turbopack cache; scanning remains enabled for source files and deployable
 build output.
 
-## Mobile cart synchronization
+## Mobile app and cart synchronization
 
-The current website cart is stored in browser `localStorage`; there is no
-server-side cart API or database cart model yet. Therefore the mobile cart
-cannot synchronize with it yet. The next phase is to add a user-owned,
-server-backed cart through the existing web API, then make both clients load
-and update that shared cart after authentication. See `prd.md`,
-`architecture.md`, and `tasks.md` for requirements and remaining work.
+The mobile app lives in `apps/mobile` built with Expo, React Native, and TypeScript.
+Both the website and mobile app communicate with the same Next.js backend and
+Neon database:
+
+- Start the mobile client from the repository root:
+  ```bash
+  npm run mobile
+  ```
+- Copy `apps/mobile/.env.example` to `apps/mobile/.env.local` to configure
+  `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`, and `EXPO_PUBLIC_SUPABASE_ANON_KEY`.
+- Both clients share the server-side cart via `/api/cart`.
+- Authenticated requests accept both web cookie sessions and mobile Supabase bearer
+  tokens, deriving the user identity securely on the server.
+- Cart changes made on either client are immediately persisted and visible on the
+  other upon reload or refresh, satisfying the nine-step assessment flow.
 
 ## Working preferences
 

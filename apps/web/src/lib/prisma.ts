@@ -13,6 +13,9 @@ const connectionUrl = new URL(databaseUrl);
 if (!connectionUrl.searchParams.has("connect_timeout")) {
   connectionUrl.searchParams.set("connect_timeout", "30");
 }
+if (!connectionUrl.searchParams.has("pool_timeout")) {
+  connectionUrl.searchParams.set("pool_timeout", "30");
+}
 
 export const prisma =
   globalForPrisma.prisma ??

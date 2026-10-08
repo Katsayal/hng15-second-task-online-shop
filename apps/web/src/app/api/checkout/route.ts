@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { NextResponse, type NextRequest } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getAuthenticatedUser } from "@/lib/auth";
 import { getAppUrl, getStripeClient } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 
@@ -43,13 +43,9 @@ function parseItems(value: unknown): RequestedItem[] | null {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  const user = await getAuthenticatedUser(request);
 
-  if (authError || !user?.email) {
+  if (!user || !user.email) {
     return NextResponse.json(
       { error: "Sign in with an account that has an email before checkout." },
       { status: 401 },
@@ -74,20 +70,6 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-  if (!appUrl) {
-    throw new Error("Missing NEXT_PUBLIC_APP_URL");
-  }
-
-  const userName =
-    typeof user.user_metadata.full_name === "string"
-      ? user.user_metadata.full_name
-      : null;
-  await prisma.user.upsert({
-    where: { id: user.id },
-    create: { id: user.id, email: user.email, fullName: userName },
-    update: { email: user.email, fullName: userName },
-  });
 
   const products = await prisma.product.findMany({
     where: { id: { in: items.map((item) => item.productId) } },
@@ -146,6 +128,33 @@ export async function POST(request: NextRequest) {
   });
 
   try {
+    const returnUrl =
+      body &&
+      typeof body === "object" &&
+      "returnUrl" in body &&
+      typeof (body as { returnUrl?: unknown }).returnUrl === "string"
+        ? (body as { returnUrl: string }).returnUrl.trim()
+        : undefined;
+
+    const host =
+      request.headers.get("x-forwarded-host") || request.headers.get("host");
+    const proto =
+      request.headers.get("x-forwarded-proto") ||
+      (host?.includes("localhost") ? "http" : "https");
+    const requestOrigin = host ? `${proto}://${host}` : checkoutBaseUrl;
+
+    let successUrl: string;
+    let cancelUrl: string;
+
+    if (returnUrl) {
+      const delimiter = returnUrl.includes("?") ? "&" : "?";
+      successUrl = `${returnUrl}${delimiter}session_id={CHECKOUT_SESSION_ID}`;
+      cancelUrl = `${returnUrl}${delimiter}canceled=1`;
+    } else {
+      successUrl = `${requestOrigin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
+      cancelUrl = `${requestOrigin}/checkout?canceled=1`;
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: user.email,
@@ -164,8 +173,8 @@ export async function POST(request: NextRequest) {
           },
         },
       })),
-      success_url: `${checkoutBaseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${checkoutBaseUrl}/checkout?canceled=1`,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
     });
 
     if (!session.url) {

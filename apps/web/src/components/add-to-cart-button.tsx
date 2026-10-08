@@ -10,15 +10,17 @@ export function AddToCartButton({
   product: CartProduct;
   quantity?: number;
 }) {
-  const { addItem } = useCart();
+  const { addItem, updatingItemId } = useCart();
+  const isUpdating = updatingItemId === product.id;
 
   return (
     <button
       type="button"
       onClick={() => addItem(product, quantity)}
-      className="w-full rounded-full bg-[#245b43] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#194531] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6c9c75]"
+      disabled={isUpdating || product.stockQuantity < 1}
+      className="w-full rounded-full bg-[#245b43] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#194531] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6c9c75] disabled:cursor-wait disabled:opacity-60"
     >
-      Add to cart
+      {isUpdating ? "Adding…" : "Add to cart"}
     </button>
   );
 }

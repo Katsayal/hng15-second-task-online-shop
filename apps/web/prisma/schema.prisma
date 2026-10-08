@@ -19,6 +19,7 @@ model User {
   fullName  String?
   createdAt DateTime @default(now())
   orders    Order[]
+  cart      Cart?
 }
 
 model Product {
@@ -30,6 +31,7 @@ model Product {
   imageUrl      String?
   createdAt     DateTime    @default(now())
   orderItems    OrderItem[]
+  cartItems     CartItem[]
 }
 
 model Order {
@@ -51,4 +53,26 @@ model OrderItem {
   product         Product  @relation(fields: [productId], references: [id])
   quantity        Int
   priceAtPurchase Decimal  @db.Decimal(10, 2)
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
 }
